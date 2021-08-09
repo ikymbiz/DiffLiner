@@ -1,0 +1,23 @@
+Option Explicit
+
+
+Private Sub Workbook_AfterSave(ByVal Success As Boolean)
+
+Dim SaveFlg As Boolean
+    SaveFlg = Sheets(menu).Range(S3).Value
+    
+    If ActiveSheet.Name = Detail Then
+        If SaveFlg = True Then
+            Call AnalyzeDetail_onSave
+        Else
+        End If
+    Else
+    End If
+End Sub
+
+
+
+Private Sub Workbook_Open()
+    Call AutoOpen
+    Sheets(menu).Select
+End Sub
