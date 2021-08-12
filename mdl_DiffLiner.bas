@@ -99,8 +99,12 @@ Dim ret As String
     Else
     End If
     
-    MsgBox "比較対象のテキストファイルを選択してください。"
-    pathB = GetFilePath
+    ret = MsgBox("比較対象のテキストファイルを選択してください。", vbOKCancel)
+    If ret <> vbCancel Then
+        pathB = GetFilePath
+    Else
+        pathB = ""
+    End If
     
     Call ImportSource(pathA, pathB)
 
@@ -127,7 +131,11 @@ Dim rowEnd As Long
     
     'テキストファイルを読み込む
     Call GetProc(pathA, col:=COL_A)
-    Call GetProc(pathB, col:=COL_B)
+    
+    If pathB <> "" Then
+        Call GetProc(pathB, col:=COL_B)
+    Else
+    End If
     
     'Summaryの一致度を返す
     If SummaryFlg = True Then

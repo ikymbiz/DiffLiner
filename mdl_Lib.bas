@@ -8,7 +8,7 @@ Function rowLast(sheetName As String, column As Long) As Long
 'sheetName     検索するシート名
 'column            検索する列番号
 
-'On Error GoTo errExit
+On Error GoTo errExit
     rowLast = Sheets(sheetName).Columns(column).Find(What:="*", _
                                                                                             LookIn:=xlFormulas, _
                                                                                             SearchOrder:=xlByRows, _
@@ -108,36 +108,36 @@ End Function
 Function GetFilePath() As String
 'ダイアログからファイルを選択し、ファイルパスを取得する
 
-Dim FilePath As String
+Dim filePath As String
 
-    FilePath = Application.GetOpenFilename
+    filePath = Application.GetOpenFilename
     
-    If FilePath = "False" Then
+    If filePath = "False" Then
         GetFilePath = False
         Exit Function
     Else
     End If
     
-    GetFilePath = FilePath
+    GetFilePath = filePath
 End Function
 
 Function GetDirPath() As String
 'ダイアログからフォルダを選択し、パスを取得する
 
-Dim FilePath As String
+Dim filePath As String
 
-    FilePath = Application.FileDialog(msoFileDialogFolderPicker).Show
+    filePath = Application.FileDialog(msoFileDialogFolderPicker).Show
     
-    If FilePath = "False" Then
+    If filePath = "False" Then
         GetDirPath = False
         Exit Function
     Else
     End If
     
-    GetDirPath = FilePath
+    GetDirPath = filePath
 End Function
 
-Function GetFileName(FilePath As String, Optional ExtensionFlg As Boolean = True) As String
+Function GetFileName(filePath As String, Optional ExtensionFlg As Boolean = True) As String
 '引数で指定されたファイル名を取得する
 
 'Arg     ExtensionFlg
@@ -145,20 +145,20 @@ Function GetFileName(FilePath As String, Optional ExtensionFlg As Boolean = True
 '     False:Returnに拡張子なし
 
     If ExtensionFlg = True Then
-        GetFileName = Mid(FilePath, InStrRev(FilePath, "\") + 1)
+        GetFileName = Mid(filePath, InStrRev(filePath, "\") + 1)
     Else
-        GetFileName = Replace(FilePath, Left(FilePath, InStrRev(FilePath, "\")), "")
-        GetFileName = Replace(GetFileName, GetExtension(FilePath), "")
+        GetFileName = Replace(filePath, Left(filePath, InStrRev(filePath, "\")), "")
+        GetFileName = Replace(GetFileName, GetExtension(filePath), "")
         GetFileName = Left(GetFileName, Len(GetFileName) - 1)
     End If
 End Function
 
-Function GetExtension(FilePath As String) As String
+Function GetExtension(filePath As String) As String
 '引数で指定されたファイルの拡張子を返す
 
-Dim FSO As Object
-    Set FSO = CreateObject("Scripting.FileSystemObject")
-    GetExtension = FSO.GetExtensionName(FilePath)
+Dim fso As Object
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    GetExtension = fso.GetExtensionName(filePath)
 End Function
 
 Function GetPCName() As String
@@ -181,24 +181,24 @@ End Function
 '    GetUserID = objUser.Name
 'End Function
 
-Function IsExist(FilePath As String) As Boolean
+Function IsExist(filePath As String) As Boolean
 'ファイル、ディレクトリの存在確認をする
 
-    If InStrRev(FilePath, ",") > 0 Then
-        If Dir(FilePath) <> "" Then
+    If InStrRev(filePath, ",") > 0 Then
+        If Dir(filePath) <> "" Then
             IsExist = True
         Else
             IsExist = False
         End If
     Else
-        If Dir(FilePath, vbDirectory) <> "" Then
+        If Dir(filePath, vbDirectory) <> "" Then
             IsExist = True
         Else
             IsExist = False
         End If
-End Function
     End If
-
+End Function
+    
 Function IsAppActivate(Title As String, Optional WaitTime As Single = 3) As Boolean
 '指定のウィンドウがアクティブか確認する
 
@@ -240,13 +240,13 @@ Dim StartTime As Single
 
     If IsExist(fokderpath) = False Then GoTo errExist
     
-    Shell "C:\Windows\Explore.exe" & FolderPath, vbNormalFocus
+    Shell "C:\Windows\Explore.exe" & folderPath, vbNormalFocus
     WaitTimeFor (WaitTime)
     StartTime = Timer
     
     'フォルダが表示されるまで待つ
     '５秒待って表示されなかったらエラーを出す
-    Do Until IsAppActivate(GetFileName(FolderPath)) = True
+    Do Until IsAppActivate(GetFileName(folderPath)) = True
         DoEvents
         
         If Timer - StartTime > 5 Then
@@ -473,3 +473,32 @@ Dim AppUserModelID As String
         
         Shell "explorer.exe shell:AppsFolder\" & AppUserModelID
 End Function
+
+Sub merge_text()
+
+Dim path As String, strPath As String
+Dim FileName As String
+Dim fso As Object
+Dim objfile As Object
+    Set fso = CreateObject("Scripting.FileSystemObject")
+Dim buf As String
+'FileNameを与える
+    FileName = "MergeText"
+    
+'path取得
+    path = ThisWorkbook.path
+
+'read_txt
+        For Each objfile In fso.getFolder(path).Files
+            strPath = path & "\" & objfile.Name
+            If GetExtension(objfile.Name) = "txt" Then
+                Open strPath For Input As #1
+                Do Until EOF(1)
+                     Line Input #1, buf
+                     Call Logging(buf, , FileName, "txt")
+                 Loop
+                 Close #1
+            Else
+            End If
+        Next
+End Sub
